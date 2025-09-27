@@ -5,11 +5,20 @@ A super simple FastAPI application that allows students to view and sign up
 for extracurricular activities at Mergington High School.
 """
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Form
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import RedirectResponse
 import os
 from pathlib import Path
+from admin_auth import authenticate_admin
+from fastapi import status
+from fastapi.responses import JSONResponse
+@app.post("/admin/login")
+def admin_login(username: str = Form(...), password: str = Form(...)):
+    """Authenticate admin user."""
+    if authenticate_admin(username, password):
+        return {"message": f"Welcome, {username}. Login successful.", "admin": True}
+    return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={"detail": "Invalid credentials"})
 
 app = FastAPI(title="Mergington High School API",
               description="API for viewing and signing up for extracurricular activities")
